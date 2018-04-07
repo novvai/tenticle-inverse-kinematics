@@ -1,8 +1,7 @@
+import { Vector } from "../vendor/Vector";
+
 export class TenticlePart {
-    public a = {
-        x: 0,
-        y: 0
-    };
+    public pointA = new Vector();
     public b = {
         x: 0,
         y: 0
@@ -12,14 +11,11 @@ export class TenticlePart {
     protected lenght: number;
     protected parent: TenticlePart | null;
 
-    constructor(angle: number, ln: number, contex: any, x:any, y?:number) {
+    constructor(angle: number, ln: number, contex: any, x?:any, y?:number) {
         this.contex = contex;
         if (y != null) {
-            this.a.x = x;
-            this.a.y = y!;
-        }else{
-            this.parent = x;
-            // this.to(this.parent!.a.x, this.parent!.b.y)
+            this.pointA.x = x;
+            this.pointA.y = y!;
         }
         this.angle = angle;
         this.lenght = ln;
@@ -28,27 +24,14 @@ export class TenticlePart {
      * to
      */
     public to(targetX: number, targetY: number) {
-        let tg = {
-            x: targetX | 0,
-            y: targetY | 0
-        }
-        let dir = {
-            x: tg.x - this.a.x,
-            y: tg.y - this.a.y
-        }
-        this.angle = Math.atan2(dir.y, dir.x);
-        let mag = Math.sqrt(Math.pow(dir.x, 2) + Math.pow(dir.y, 2))
-        if (mag != 0 && mag !=1){
-            dir.x /= mag;
-            dir.y /= mag;
-        }
-        dir.x *= this.lenght;
-        dir.y *= this.lenght;
-        dir.x = -dir.x;
-        dir.y = -dir.y;
+        let tg = new Vector(targetX | 0, targetY | 0)
+        let dir = Vector.subtract(tg, this.pointA);
 
-        this.a.x = dir.x + tg.x;
-        this.a.y = dir.y + tg.y;
+        this.angle = dir.heading();
+
+        dir.setMagnitude(-this.lenght);
+
+        this.pointA = Vector.add(tg, dir);
     }
     /**
      * update
@@ -62,23 +45,23 @@ export class TenticlePart {
     private calculate() {
         let dx = this.lenght * Math.cos(this.angle);
         let dy = this.lenght * Math.sin(this.angle);
+        let dXY = new Vector(dx, dy);
 
-        this.b.x = this.a.x + dx;
-        this.b.y = this.a.y + dy;
+        this.b = Vector.add(this.pointA, dXY);
     }
     /**
      * draw
      */
     public draw() {
         this.contex.beginPath();
-        this.contex.moveTo(this.a.x, this.a.y)
+        this.contex.moveTo(this.pointA.x, this.pointA.y)
         this.contex.lineTo(this.b.x, this.b.y)
         this.contex.stroke()
 
         this.contex.beginPath();
         this.contex.fillStyle = 'red';
         this.contex.fill()
-        this.contex.arc(this.a.x, this.a.y, 2,0, Math.PI*2)
+        this.contex.arc(this.pointA.x, this.pointA.y, 2,0, Math.PI*2)
         this.contex.stroke()
         
         this.contex.beginPath();

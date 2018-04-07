@@ -1,4 +1,4 @@
-import { Canvas } from "./canvas";
+import { Canvas } from "../vendor/canvas";
 import { TenticlePart } from "./TenticlePart";
 
 export class Game extends Canvas {
@@ -12,9 +12,8 @@ export class Game extends Canvas {
 
         this.head = new TenticlePart(0, 20, this.context, 0, 0);
         this.elements.push(this.head);
-        // this.seg2 = new TenticlePart(0, 30, this.context, this.seg1);
         for (let index = 0; index < 20; index++) {
-            this.elements.push(new TenticlePart(0, 40, this.context, this.elements[index-1]));
+            this.elements.push(new TenticlePart(0, 40, this.context));
         }
     }
 
@@ -23,7 +22,7 @@ export class Game extends Canvas {
         
         this.head.to(this.mouseX, this.mouseY);
         for (let index = 1; index < this.elements.length; index++) {
-            this.elements[index].to(this.elements[index - 1].a.x, this.elements[index - 1].a.y);
+            this.elements[index].to(this.elements[index - 1].pointA.x, this.elements[index - 1].pointA.y);
             this.elements[index].update();
             this.elements[index].draw();
         }
